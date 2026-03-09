@@ -204,3 +204,11 @@
     }
   }
 }
+.task-title-link {
+  text-decoration: none;
+  color: inherit;
+
+  &:hover .task-title {
+    color: #4f46e5;
+  }
+}

@@ -1,8 +1,12 @@
 <header class="app-header">
-  <h1>Task Manager</h1>
-  <nav>
+  <div class="brand">
+    <span class="brand-dot" aria-hidden="true"></span>
+    <h1>Project Manager</h1>
+  </div>
+  <nav class="app-nav">
     <a routerLink="/projects" routerLinkActive="active">Projects</a>
     <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
+    <a routerLink="/journal" routerLinkActive="active">Journal</a>
     <a routerLink="/auth/login" routerLinkActive="active">Login</a>
   </nav>
 </header>

@@ -5,9 +5,11 @@ import { ProjectList } from './features/projects/pages/project-list/project-list
 import { ProjectDetails } from './features/projects/pages/project-details/project-details';
 import { TaskList } from './features/tasks/pages/task-list/task-list';
 import { authGuard } from './core/guards/auth-guard';
+import { TaskDetails } from './features/tasks/pages/task-details/task-details';
+import { JournalList } from './features/journal/pages/journal-list/journal-list';
 
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'projects' },
+  { path: '', pathMatch: 'full', redirectTo: 'auth/login' },
   {
     path: 'auth',
     children: [
@@ -26,7 +28,15 @@ export const routes: Routes = [
   {
     path: 'tasks',
     canActivate: [authGuard],
-    children: [{ path: '', component: TaskList }],
+    children: [
+      { path: '', component: TaskList },
+      { path: ':id', component: TaskDetails },
+    ],
+  },
+  {
+    path: 'journal',
+    canActivate: [authGuard],
+    children: [{ path: '', component: JournalList }],
   },
   { path: '**', redirectTo: 'projects' },
 ];

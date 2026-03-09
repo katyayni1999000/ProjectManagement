@@ -92,6 +92,15 @@
   margin: 0 0 0.35rem;
 }
 
+.task-title-link {
+  text-decoration: none;
+  color: inherit;
+
+  &:hover .task-title {
+    color: #4f46e5;
+  }
+}
+
 .task-description {
   margin: 0.25rem 0 0.5rem;
   color: #374151;

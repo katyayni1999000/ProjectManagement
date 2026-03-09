@@ -1,0 +1,140 @@
+<section class="journal-page">
+  <header class="journal-header">
+    <div>
+      <h2>Journal</h2>
+      <p class="subtitle">Capture moments, moods, and ideas—beautifully organized.</p>
+    </div>
+    <div class="journal-count">
+      <span class="count">{{ journals().length }}</span>
+      <span class="label">Entries</span>
+    </div>
+  </header>
+
+  <div class="journal-grid">
+    <section class="journal-form-card">
+      <h3>New entry</h3>
+      <form (ngSubmit)="createEntry()">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Title</label>
+            <input
+              type="text"
+              name="title"
+              [(ngModel)]="newEntry.title"
+              placeholder="Today felt..."
+              required
+            />
+          </div>
+          <div class="form-field">
+            <label>Date</label>
+            <input type="date" name="entryDate" [(ngModel)]="newEntry.entryDate" required />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label>Mood</label>
+          <div class="mood-row">
+            @for (mood of moods; track mood.value) {
+              <button
+                type="button"
+                class="mood-pill"
+                [class.active]="newEntry.mood === mood.value"
+                (click)="setMood(mood.value)"
+              >
+                <span class="emoji">{{ mood.emoji }}</span>
+                {{ mood.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label>Link to task (optional)</label>
+          <select name="taskId" [(ngModel)]="newEntry.taskId">
+            <option value="">No task linked</option>
+            @for (task of tasks(); track task.id) {
+              <option [value]="task.id">{{ task.title }}</option>
+            }
+          </select>
+          @if (loadingTasks()) {
+            <span class="helper-message">Loading tasks…</span>
+          }
+        </div>
+
+        <div class="form-field">
+          <label>Body</label>
+          <textarea
+            name="body"
+            rows="5"
+            [(ngModel)]="newEntry.body"
+            placeholder="Write your thoughts here..."
+            required
+          ></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="creating()">
+          {{ creating() ? 'Saving…' : 'Save entry' }}
+        </button>
+      </form>
+    </section>
+
+    <section class="journal-entries">
+      <div class="entries-header">
+        <h3>Recent entries</h3>
+        @if (loading()) {
+          <span class="helper-message">Loading entries…</span>
+        }
+      </div>
+
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+
+      @if (!loading() && journals().length > 0) {
+        <div class="entries-list">
+          @for (entry of journals(); track entry.id) {
+            <article class="entry-card">
+              <header class="entry-header">
+                <div>
+                  <h4>{{ entry.title }}</h4>
+                  <span class="entry-date">{{ entry.entryDate | date: 'fullDate' }}</span>
+                </div>
+                <span class="mood-badge" [class]="'mood-' + entry.mood">
+                  {{ getMoodEmoji(entry.mood) }} {{ getMoodLabel(entry.mood) }}
+                </span>
+              </header>
+
+              <p class="entry-body">{{ entry.body }}</p>
+
+              @if (entry.taskId && getTaskTitle(entry.taskId)) {
+                <a class="task-link" [routerLink]="['/tasks', entry.taskId]">
+                  Linked task: {{ getTaskTitle(entry.taskId) }}
+                </a>
+              }
+
+              <footer class="entry-footer">
+                <span class="updated">Updated {{ entry.updatedAt | date: 'mediumDate' }}</span>
+                <button
+                  type="button"
+                  class="btn-danger"
+                  [disabled]="deletingId() === entry.id"
+                  (click)="deleteEntry(entry.id)"
+                >
+                  {{ deletingId() === entry.id ? 'Deleting…' : 'Delete' }}
+                </button>
+              </footer>
+            </article>
+          }
+        </div>
+      }
+
+      @if (!loading() && journals().length === 0) {
+        <div class="empty-state-card">
+          <div class="empty-icon">📓</div>
+          <h4>No journal entries yet</h4>
+          <p class="empty-state">Start with your first reflection. A few lines today can become wisdom tomorrow.</p>
+        </div>
+      }
+    </section>
+  </div>
+</section>

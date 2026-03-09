@@ -1,14 +1,14 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterLink, RouterModule } from '@angular/router';
 import { Project as ProjectService, ProjectData } from '../../data/project';
 import { Task as TaskService, TaskData, CreateTaskDto } from '../../../tasks/data/task';
 
 @Component({
   selector: 'app-project-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, RouterLink],
   templateUrl: './project-details.html',
   styleUrl: './project-details.scss',
 })

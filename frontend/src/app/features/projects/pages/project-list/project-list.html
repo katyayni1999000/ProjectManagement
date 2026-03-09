@@ -1,6 +1,13 @@
 <section class="projects-page">
-  <header>
-    <h2>Your projects</h2>
+  <header class="projects-header">
+    <div>
+      <h2>Your projects</h2>
+      <p class="subtitle">Organize work, track progress, and jump into details fast.</p>
+    </div>
+    <div class="projects-count">
+      <span class="count">{{ projects.length }}</span>
+      <span class="label">Projects</span>
+    </div>
   </header>
 
   <form class="inline-form" (submit)="createProject($event)">
@@ -25,18 +32,27 @@
   </form>
 
   @if (loading()) {
-    <div>Loading projects…</div>
+    <div class="helper-message">Loading projects…</div>
   }
 
   @if (!loading() && projects.length > 0) {
-    <ul>
+    <ul class="projects-grid">
       @for (project of projects; track project.id) {
-        <li>
-          <a [routerLink]="['/projects', project.id]">
-            <h3>{{ project.name }}</h3>
+        <li class="project-card">
+          <a class="project-link" [routerLink]="['/projects', project.id]">
+            <div class="card-header">
+              <h3>{{ project.name }}</h3>
+              <span class="status" [class]="'status-' + project.status">{{ project.status }}</span>
+            </div>
             @if (project.description) {
-              <p>{{ project.description }}</p>
+              <p class="description">{{ project.description }}</p>
+            } @else {
+              <p class="description placeholder">No description yet.</p>
             }
+            <div class="card-footer">
+              <span class="meta">Updated {{ project.updatedAt | date: 'mediumDate' }}</span>
+              <span class="cta">View details →</span>
+            </div>
           </a>
         </li>
       }
@@ -44,8 +60,6 @@
   }
 
   @if (!loading() && projects.length === 0) {
-    <p>
-      You don't have any projects yet.
-    </p>
+    <p class="empty-state">You don't have any projects yet.</p>
   }
 </section>

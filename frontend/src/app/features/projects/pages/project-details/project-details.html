@@ -8,66 +8,68 @@
       }
     </header>
 
-  <section class="tasks-section">
-    <h2>Tasks</h2>
-    
-    <form class="add-task-form" (ngSubmit)="createTask()">
-      <input 
-        type="text" 
-        name="title" 
-        [(ngModel)]="newTaskTitle" 
-        placeholder="Add a new task..." 
-        required 
-      />
-      <input 
-        type="text" 
-        name="description" 
-        [(ngModel)]="newTaskDescription" 
-        placeholder="Description (optional)" 
-      />
-      <select name="priority" [(ngModel)]="newTaskPriority">
-        <option value="low">Low</option>
-        <option value="medium">Medium</option>
-        <option value="high">High</option>
-      </select>
-      <button type="submit" [disabled]="creatingTask || !newTaskTitle.trim()">
-        {{ creatingTask ? 'Creating…' : 'Add task' }}
-      </button>
-    </form>
+    <section class="tasks-section">
+      <h2>Tasks</h2>
 
-    @if (loading()) {
-      <div class="loading">Loading tasks…</div>
-    }
+      <form class="add-task-form" (ngSubmit)="createTask()">
+        <input
+          type="text"
+          name="title"
+          [(ngModel)]="newTaskTitle"
+          placeholder="Add a new task..."
+          required
+        />
+        <input
+          type="text"
+          name="description"
+          [(ngModel)]="newTaskDescription"
+          placeholder="Description (optional)"
+        />
+        <select name="priority" [(ngModel)]="newTaskPriority">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+        <button type="submit" [disabled]="creatingTask || !newTaskTitle.trim()">
+          {{ creatingTask ? 'Creating…' : 'Add task' }}
+        </button>
+      </form>
 
-    @if (!loading() && tasks().length > 0) {
-      <div class="tasks-list">
-        @for (task of tasks(); track task.id) {
-          <div class="task-card" [class]="'status-' + task.status">
-            <div class="task-header">
-              <h3>{{ task.title }}</h3>
-              <span class="priority" [class]="'priority-' + task.priority">{{ task.priority }}</span>
-            </div>
-            @if (task.description) {
-              <p class="description">{{ task.description }}</p>
-            }
-            <div class="task-actions">
-              <select [ngModel]="task.status" (ngModelChange)="updateTaskStatus(task, $event)">
-                <option value="todo">To Do</option>
-                <option value="in_progress">In Progress</option>
-                <option value="done">Done</option>
-              </select>
-              <button (click)="deleteTask(task.id)" class="delete-btn">Delete</button>
-            </div>
-          </div>
-        }
-      </div>
-    }
+      @if (loading()) {
+        <div class="loading">Loading tasks…</div>
+      }
 
-    @if (!loading() && tasks().length === 0) {
-      <p class="no-tasks">
-        No tasks yet. Add one to get started!
-      </p>
-    }
-  </section>
+      @if (!loading() && tasks().length > 0) {
+        <div class="tasks-list">
+          @for (task of tasks(); track task.id) {
+            <a class="task-title-link" [routerLink]="['/tasks', task.id]">
+              <div class="task-card" [class]="'status-' + task.status">
+                <div class="task-header">
+                  <h3 class="task-title">{{ task.title }}</h3>
+                  <span class="priority" [class]="'priority-' + task.priority">{{
+                    task.priority
+                  }}</span>
+                </div>
+                @if (task.description) {
+                  <p class="description">{{ task.description }}</p>
+                }
+                <div class="task-actions">
+                  <select [ngModel]="task.status" (ngModelChange)="updateTaskStatus(task, $event)">
+                    <option value="todo">To Do</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="done">Done</option>
+                  </select>
+                  <button (click)="deleteTask(task.id)" class="delete-btn">Delete</button>
+                </div>
+              </div>
+            </a>
+          }
+        </div>
+      }
+
+      @if (!loading() && tasks().length === 0) {
+        <p class="no-tasks">No tasks yet. Add one to get started!</p>
+      }
+    </section>
   }
 </section>
