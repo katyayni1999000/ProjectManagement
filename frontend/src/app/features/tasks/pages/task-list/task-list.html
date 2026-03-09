@@ -1,0 +1,251 @@
+<section class="tasks-page">
+  <header class="tasks-header">
+    <h2>Your tasks</h2>
+  </header>
+
+  <form class="inline-form" (ngSubmit)="createTask()">
+    <select name="projectId" [(ngModel)]="newTask.projectId" required>
+      <option value="" disabled>Select project</option>
+      @for (project of projects; track project.id) {
+        <option [value]="project.id">{{ project.name }}</option>
+      }
+    </select>
+    <input type="text" name="title" [(ngModel)]="newTask.title" placeholder="Task title" required />
+    <input
+      type="text"
+      name="description"
+      [(ngModel)]="newTask.description"
+      placeholder="Description (optional)"
+    />
+    <button
+      type="submit"
+      [disabled]="creating || projects.length === 0 || !newTask.projectId.trim() || !newTask.title.trim()"
+    >
+      {{ creating ? 'Creating…' : 'Add task' }}
+    </button>
+  </form>
+
+  @if (loadingProjects()) {
+    <p class="helper-message">Loading projects…</p>
+  }
+
+  @if (!loadingProjects() && projects.length === 0) {
+    <p class="helper-message">Create a project first, then you can add tasks to it.</p>
+  }
+
+  @if (errorMessage) {
+    <p class="error-message">{{ errorMessage }}</p>
+  }
+
+  @if (loading()) {
+    <div class="helper-message">Loading tasks…</div>
+  }
+
+  @if (!loading() && tasks.length > 0) {
+    <ul class="task-grid">
+      @for (task of tasks; track task.id) {
+        <li class="task-card">
+          <h3 class="task-title">{{ task.title }}</h3>
+          @if (task.description) {
+            <p class="task-description">{{ task.description }}</p>
+          }
+          <p class="meta">Status: {{ task.status }} · Priority: {{ task.priority }}</p>
+
+          @if (task.notes.length) {
+            <div class="notes-section">
+              <div class="notes-header">
+                <h4 class="notes-title">📝 Notes ({{ task.notes.length }})</h4>
+              </div>
+              <ul class="notes-list">
+                @for (note of task.notes; track note.id) {
+                  <li class="note-item" [class.note-drawing]="note.type === 'drawing'">
+                    @if (editingNoteId === note.id) {
+                      <div class="note-edit-form">
+                        <textarea
+                          class="note-edit-input"
+                          [(ngModel)]="editingNoteContent"
+                          [name]="'edit-note-' + note.id"
+                          rows="2"
+                          maxlength="500"
+                          placeholder="Edit note..."
+                        ></textarea>
+                        <div class="note-edit-actions">
+                          <button
+                            type="button"
+                            class="btn-save"
+                            (click)="saveEditNote(task, note)"
+                          >
+                            ✓ Save
+                          </button>
+                          <button
+                            type="button"
+                            class="btn-cancel"
+                            (click)="cancelEditNote()"
+                          >
+                            ✕ Cancel
+                          </button>
+                        </div>
+                      </div>
+                    } @else {
+                      <div class="note-content">
+                        @if (note.type === 'text') {
+                          <p class="note-text">{{ note.content }}</p>
+                        } @else if (note.type === 'checklist') {
+                          <div class="checklist">
+                            @for (item of parseChecklist(note.content); track $index) {
+                              <label class="checklist-item">
+                                <input
+                                  type="checkbox"
+                                  [checked]="item.checked"
+                                  (change)="toggleChecklistItem(task, note, $index)"
+                                />
+                                <span [class.checked]="item.checked">{{ item.text }}</span>
+                              </label>
+                            }
+                          </div>
+                        } @else if (note.type === 'drawing') {
+                          <img [src]="note.content" alt="Drawing" class="drawing-image" />
+                        }
+                        <span class="note-timestamp">{{ getRelativeTime(note.createdAt) }}</span>
+                      </div>
+                      <div class="note-actions">
+                        @if (note.type !== 'drawing') {
+                          <button
+                            type="button"
+                            class="btn-icon btn-edit"
+                            (click)="startEditNote(note)"
+                            [disabled]="deletingNoteId === note.id"
+                            title="Edit note"
+                          >
+                            ✎
+                          </button>
+                        }
+                        <button
+                          type="button"
+                          class="btn-icon btn-delete"
+                          [disabled]="deletingNoteId === note.id"
+                          (click)="confirmDeleteNote(task, note.id)"
+                          title="Delete note"
+                        >
+                          {{ deletingNoteId === note.id ? '⏳' : '🗑' }}
+                        </button>
+                      </div>
+                    }
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+
+          <form class="add-note-form" (ngSubmit)="addNote(task)">
+            <div class="note-type-selector">
+              <button
+                type="button"
+                class="note-type-btn"
+                [class.active]="noteType[task.id] === 'text'"
+                (click)="setNoteType(task.id, 'text')"
+                title="Text note"
+              >
+                📄 Text
+              </button>
+              <button
+                type="button"
+                class="note-type-btn"
+                [class.active]="noteType[task.id] === 'checklist'"
+                (click)="setNoteType(task.id, 'checklist')"
+                title="Checklist"
+              >
+                ✓ Checklist
+              </button>
+              <button
+                type="button"
+                class="note-type-btn"
+                [class.active]="noteType[task.id] === 'drawing'"
+                (click)="setNoteType(task.id, 'drawing')"
+                title="Drawing"
+              >
+                ✏️ Drawing
+              </button>
+            </div>
+
+            @if (noteType[task.id] === 'drawing') {
+              <button
+                type="button"
+                class="btn-add-note"
+                (click)="openDrawingModal(task.id)"
+                [disabled]="addingNoteFor[task.id]"
+              >
+                🎨 Create Drawing
+              </button>
+            } @else {
+              <div class="note-input-wrapper">
+                @if (noteType[task.id] === 'text') {
+                  <textarea
+                    class="note-input"
+                    [name]="'note-' + task.id"
+                    [(ngModel)]="noteContent[task.id]"
+                    placeholder="Add a text note..."
+                    rows="2"
+                    maxlength="500"
+                    [disabled]="addingNoteFor[task.id]"
+                  ></textarea>
+                } @else {
+                  <textarea
+                    class="note-input"
+                    [name]="'note-' + task.id"
+                    [(ngModel)]="noteContent[task.id]"
+                    placeholder="Add checklist items (one per line)..."
+                    rows="2"
+                    maxlength="500"
+                    [disabled]="addingNoteFor[task.id]"
+                  ></textarea>
+                }
+                <span class="char-counter">{{ getCharacterCount(task.id) }}</span>
+              </div>
+              <button
+                type="submit"
+                class="btn-add-note"
+                [disabled]="addingNoteFor[task.id] || !noteContent[task.id]?.trim()"
+              >
+                {{ addingNoteFor[task.id] ? '⏳ Adding...' : '+ Add Note' }}
+              </button>
+            }
+          </form>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (!loading() && tasks.length === 0) {
+    <p class="helper-message">You don't have any tasks yet.</p>
+  }
+</section>
+
+<!-- Drawing Modal -->
+@if (showDrawingModal) {
+  <div class="modal-overlay" (click)="closeDrawingModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>🎨 Create Drawing</h3>
+        <button type="button" class="btn-close" (click)="closeDrawingModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <canvas
+          #drawingCanvas
+          width="600"
+          height="400"
+          class="drawing-canvas"
+          (mousedown)="startDrawing($event)"
+          (mousemove)="draw($event)"
+          (mouseup)="stopDrawing()"
+          (mouseleave)="stopDrawing()"
+        ></canvas>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="clearCanvas()">🗑 Clear</button>
+        <button type="button" class="btn-primary" (click)="saveDrawing()">💾 Save Drawing</button>
+      </div>
+    </div>
+  </div>
+}
+

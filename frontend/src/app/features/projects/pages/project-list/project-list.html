@@ -1,0 +1,51 @@
+<section class="projects-page">
+  <header>
+    <h2>Your projects</h2>
+  </header>
+
+  <form class="inline-form" (submit)="createProject($event)">
+    <input
+      type="text"
+      name="name"
+      [value]="newName"
+      (input)="newName = $any($event.target).value"
+      placeholder="New project name"
+      required
+    />
+    <input
+      type="text"
+      name="description"
+      [value]="newDescription"
+      (input)="newDescription = $any($event.target).value"
+      placeholder="Description (optional)"
+    />
+    <button type="submit" [disabled]="creating || !newName.trim()">
+      {{ creating ? 'Creating…' : 'Add project' }}
+    </button>
+  </form>
+
+  @if (loading()) {
+    <div>Loading projects…</div>
+  }
+
+  @if (!loading() && projects.length > 0) {
+    <ul>
+      @for (project of projects; track project.id) {
+        <li>
+          <a [routerLink]="['/projects', project.id]">
+            <h3>{{ project.name }}</h3>
+            @if (project.description) {
+              <p>{{ project.description }}</p>
+            }
+          </a>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (!loading() && projects.length === 0) {
+    <p>
+      You don't have any projects yet.
+    </p>
+  }
+</section>

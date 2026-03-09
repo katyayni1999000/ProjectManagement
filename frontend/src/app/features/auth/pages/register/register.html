@@ -1,0 +1,31 @@
+<section class="auth-page">
+  <h2>Create your account</h2>
+
+  <form (ngSubmit)="submit()" #registerForm="ngForm">
+    <label>
+      Name
+      <input type="text" name="name" [(ngModel)]="name" required />
+    </label>
+
+    <label>
+      Email
+      <input type="email" name="email" [(ngModel)]="email" required />
+    </label>
+
+    <label>
+      Password
+      <input type="password" name="password" [(ngModel)]="password" required minlength="6" />
+    </label>
+
+    <button type="submit" [disabled]="registerForm.invalid || loading()">
+      {{ loading() ? 'Creating account…' : 'Sign up' }}
+    </button>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+
+    <p class="hint">
+      Already have an account?
+      <a routerLink="/auth/login">Sign in</a>
+    </p>
+  </form>
+</section>
