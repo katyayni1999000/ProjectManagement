@@ -2,12 +2,16 @@
   <div class="brand">
     <img class="brand-logo" src="brand-logo.svg" alt="Project Manager" />
     <h1>Project Manager</h1>
-    </div>
+  </div>
   <nav class="app-nav">
-    <a routerLink="/projects" routerLinkActive="active">Projects</a>
-    <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
-    <a routerLink="/journal" routerLinkActive="active">Journal</a>
-    <a routerLink="/auth/login" routerLinkActive="active">Login</a>
+    @if (currentUser()) {
+      <a routerLink="/projects" routerLinkActive="active">Projects</a>
+      <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
+      <a routerLink="/journal" routerLinkActive="active">Journal</a>
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    } @else {
+      <a routerLink="/auth/login" routerLinkActive="active">Login</a>
+    }
   </nav>
 </header>
 

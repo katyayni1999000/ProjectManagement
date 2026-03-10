@@ -23,7 +23,7 @@ export class TaskList implements OnInit {
   projects: ProjectData[] = [];
   loading = signal(false);
   loadingProjects = signal(false);
-  creating = false;
+  creating = signal(false);
   errorMessage = '';
   newTask = {
     projectId: '',
@@ -78,7 +78,7 @@ export class TaskList implements OnInit {
     if (!this.newTask.projectId.trim() || !this.newTask.title.trim()) {
       return;
     }
-    this.creating = true;
+    this.creating.set(true);
     this.taskService
       .create({
         projectId: this.newTask.projectId,
@@ -93,10 +93,10 @@ export class TaskList implements OnInit {
             title: '',
             description: '',
           };
-          this.creating = false;
+          this.creating.set(false);
         },
         error: () => {
-          this.creating = false;
+          this.creating.set(false);
         },
       });
   }
