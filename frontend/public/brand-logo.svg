@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Project Manager logo">
+  <defs>
+    <linearGradient id="brandG" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="104" height="104" rx="28" fill="url(#brandG)"/>
+  <path d="M30 82V36h24c10.2 0 16.8 5.1 16.8 13.9 0 8.5-6.6 13.4-16.8 13.4H42V82H30zm12-28.6h8.9c4.2 0 6.8-2.1 6.8-5.3 0-3.4-2.6-5.5-6.8-5.5H42v10.8z" fill="#fff"/>
+  <circle cx="84" cy="80" r="10" fill="#fff" opacity="0.95"/>
+</svg>
