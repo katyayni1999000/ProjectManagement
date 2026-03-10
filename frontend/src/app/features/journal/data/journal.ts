@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { buildApiUrl } from '../../../core/config/api-base-url';
 
 export type JournalMood = 'happy' | 'neutral' | 'sad' | 'stressed' | 'excited' | 'calm';
 
@@ -37,22 +38,22 @@ export class Journal {
   constructor(private http: HttpClient) {}
 
   getAll() {
-    return this.http.get<JournalData[]>('http://localhost:3000/journals');
+    return this.http.get<JournalData[]>(buildApiUrl('journals'));
   }
 
   getById(id: string) {
-    return this.http.get<JournalData>(`http://localhost:3000/journals/${id}`);
+    return this.http.get<JournalData>(buildApiUrl(`journals/${id}`));
   }
 
   create(dto: CreateJournalDto) {
-    return this.http.post<JournalData>('http://localhost:3000/journals', dto);
+    return this.http.post<JournalData>(buildApiUrl('journals'), dto);
   }
 
   update(id: string, dto: UpdateJournalDto) {
-    return this.http.patch<JournalData>(`http://localhost:3000/journals/${id}`, dto);
+    return this.http.patch<JournalData>(buildApiUrl(`journals/${id}`), dto);
   }
 
   delete(id: string) {
-    return this.http.delete<{ success: boolean }>(`http://localhost:3000/journals/${id}`);
+    return this.http.delete<{ success: boolean }>(buildApiUrl(`journals/${id}`));
   }
 }

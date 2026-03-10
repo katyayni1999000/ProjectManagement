@@ -4,8 +4,12 @@ import {
   isMainModule,
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
+import dotenv from 'dotenv';
 import express from 'express';
 import { join } from 'node:path';
+
+const envPaths = [join(process.cwd(), '.env'), join(process.cwd(), '../.env')];
+envPaths.forEach((envPath) => dotenv.config({ path: envPath }));
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -34,6 +38,13 @@ app.use(
     redirect: false,
   }),
 );
+
+app.get('/config.js', (req, res) => {
+  const apiUrl = process.env['API_URL'] || 'http://localhost:3000';
+  res.setHeader('Content-Type', 'application/javascript');
+  res.setHeader('Cache-Control', 'no-store, max-age=0');
+  res.send(`window.__API_BASE_URL__ = ${JSON.stringify(apiUrl)};`);
+});
 
 /**
  * Handle all other requests by rendering the Angular application.

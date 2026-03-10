@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { buildApiUrl } from '../../../core/config/api-base-url';
 
 export type TaskStatus = 'todo' | 'in_progress' | 'done';
 export type TaskPriority = 'low' | 'medium' | 'high';
@@ -55,7 +56,7 @@ export class Task {
   constructor(private http: HttpClient) {}
 
   getAll(projectId?: string) {
-    let url = 'http://localhost:3000/tasks';
+    let url = buildApiUrl('tasks');
     if (projectId) {
       url += `?projectId=${projectId}`;
     }
@@ -63,26 +64,26 @@ export class Task {
   }
 
   getById(id: string) {
-    return this.http.get<TaskData>(`http://localhost:3000/tasks/${id}`);
+    return this.http.get<TaskData>(buildApiUrl(`tasks/${id}`));
   }
 
   create(dto: CreateTaskDto) {
-    return this.http.post<TaskData>('http://localhost:3000/tasks', dto);
+    return this.http.post<TaskData>(buildApiUrl('tasks'), dto);
   }
 
   update(id: string, dto: UpdateTaskDto) {
-    return this.http.patch<TaskData>(`http://localhost:3000/tasks/${id}`, dto);
+    return this.http.patch<TaskData>(buildApiUrl(`tasks/${id}`), dto);
   }
 
   delete(id: string) {
-    return this.http.delete<{ success: boolean }>(`http://localhost:3000/tasks/${id}`);
+    return this.http.delete<{ success: boolean }>(buildApiUrl(`tasks/${id}`));
   }
 
   addNote(taskId: string, dto: AddNoteDto) {
-    return this.http.post<TaskNote>(`http://localhost:3000/tasks/${taskId}/notes`, dto);
+    return this.http.post<TaskNote>(buildApiUrl(`tasks/${taskId}/notes`), dto);
   }
 
   deleteNote(taskId: string, noteId: string) {
-    return this.http.delete<{ success: boolean }>(`http://localhost:3000/tasks/${taskId}/notes/${noteId}`);
+    return this.http.delete<{ success: boolean }>(buildApiUrl(`tasks/${taskId}/notes/${noteId}`));
   }
 }

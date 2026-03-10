@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
+import { buildApiUrl } from '../../../core/config/api-base-url';
 
 export interface AuthUser {
   id: string;
@@ -38,7 +39,7 @@ export class Auth {
 
   login(email: string, password: string) {
     return this.http
-      .post<AuthResponse>('http://localhost:3000/auth/login', { email, password })
+      .post<AuthResponse>(buildApiUrl('auth/login'), { email, password })
       .pipe(
         tap((res) => {
           if (this.isBrowser()) {
@@ -52,7 +53,7 @@ export class Auth {
 
   register(name: string, email: string, password: string) {
     return this.http
-      .post<AuthUser>('http://localhost:3000/auth/register', { name, email, password })
+      .post<AuthUser>(buildApiUrl('auth/register'), { name, email, password })
       .pipe(
         tap((user) => {
           this.currentUser.set(user);
