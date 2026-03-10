@@ -15,7 +15,7 @@ export class ProjectList implements OnInit {
 
   projects: ProjectData[] = [];
   loading = signal(false);
-  creating = false;
+  creating = signal(false);
   newName = '';
   newDescription = '';
 
@@ -41,7 +41,7 @@ export class ProjectList implements OnInit {
     if (!this.newName?.trim()) {
       return;
     }
-    this.creating = true;
+    this.creating.set(true);
     this.projectService
       .create({
         name: this.newName,
@@ -52,10 +52,10 @@ export class ProjectList implements OnInit {
           this.projects = [...this.projects, project];
           this.newName = '';
           this.newDescription = '';
-          this.creating = false;
+          this.creating.set(false);
         },
         error: () => {
-          this.creating = false;
+          this.creating.set(false);
         },
       });
   }
