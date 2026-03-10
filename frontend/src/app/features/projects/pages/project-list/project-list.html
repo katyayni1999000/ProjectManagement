@@ -26,8 +26,8 @@
       (input)="newDescription = $any($event.target).value"
       placeholder="Description (optional)"
     />
-    <button type="submit" [disabled]="creating || !newName.trim()">
-      {{ creating ? 'Creating…' : 'Add project' }}
+    <button type="submit" [disabled]="creating() || !newName.trim()">
+      {{ creating() ? 'Creating…' : 'Add project' }}
     </button>
   </form>
 

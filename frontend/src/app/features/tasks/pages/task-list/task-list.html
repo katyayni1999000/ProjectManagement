@@ -20,10 +20,10 @@
     <button
       type="submit"
       [disabled]="
-        creating || projects.length === 0 || !newTask.projectId.trim() || !newTask.title.trim()
+        creating() || projects.length === 0 || !newTask.projectId.trim() || !newTask.title.trim()
       "
     >
-      {{ creating ? 'Creating…' : 'Add task' }}
+      {{ creating() ? 'Creating…' : 'Add task' }}
     </button>
   </form>
 
