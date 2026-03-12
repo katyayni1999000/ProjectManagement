@@ -19,15 +19,11 @@ export interface AuthResponse {
 })
 export class Auth {
   private readonly tokenKey = 'taskManagerToken';
+  private readonly userKey = 'taskManagerUser';
   currentUser = signal<AuthUser | null>(null);
 
   constructor(private http: HttpClient) {
-    if (this.isBrowser()) {
-      const storedUser = localStorage.getItem('taskManagerUser');
-      if (storedUser) {
-        this.currentUser.set(JSON.parse(storedUser));
-      }
-    }
+    this.restoreSession();
   }
 
   get token(): string | null {
@@ -42,30 +38,17 @@ export class Auth {
       .post<AuthResponse>(buildApiUrl('auth/login'), { email, password })
       .pipe(
         tap((res) => {
-          if (this.isBrowser()) {
-            localStorage.setItem(this.tokenKey, res.accessToken);
-            localStorage.setItem('taskManagerUser', JSON.stringify(res.user));
-          }
-          this.currentUser.set(res.user);
+          this.persistSession(res.accessToken, res.user);
         }),
       );
   }
 
   register(name: string, email: string, password: string) {
-    return this.http
-      .post<AuthUser>(buildApiUrl('auth/register'), { name, email, password })
-      .pipe(
-        tap((user) => {
-          this.currentUser.set(user);
-        }),
-      );
+    return this.http.post<AuthUser>(buildApiUrl('auth/register'), { name, email, password });
   }
 
   logout() {
-    if (this.isBrowser()) {
-      localStorage.removeItem(this.tokenKey);
-      localStorage.removeItem('taskManagerUser');
-    }
+    this.clearStoredSession();
     this.currentUser.set(null);
   }
 
@@ -75,6 +58,45 @@ export class Auth {
 
   private isBrowser(): boolean {
     return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+  }
+
+  private restoreSession() {
+    if (!this.isBrowser()) {
+      return;
+    }
+
+    const token = localStorage.getItem(this.tokenKey);
+    const storedUser = localStorage.getItem(this.userKey);
+
+    if (!token || !storedUser) {
+      this.clearStoredSession();
+      return;
+    }
+
+    try {
+      this.currentUser.set(JSON.parse(storedUser) as AuthUser);
+    } catch {
+      this.clearStoredSession();
+      this.currentUser.set(null);
+    }
+  }
+
+  private persistSession(token: string, user: AuthUser) {
+    if (this.isBrowser()) {
+      localStorage.setItem(this.tokenKey, token);
+      localStorage.setItem(this.userKey, JSON.stringify(user));
+    }
+
+    this.currentUser.set(user);
+  }
+
+  private clearStoredSession() {
+    if (!this.isBrowser()) {
+      return;
+    }
+
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.userKey);
   }
 }
 
