@@ -17,6 +17,10 @@ export class App {
     return this.authService.currentUser;
   }
 
+  get showGuestNav(): boolean {
+    return !this.currentUser() && !this.router.url.startsWith('/auth/');
+  }
+
   logout() {
     this.authService.logout();
     this.router.navigate(['/auth/login']);

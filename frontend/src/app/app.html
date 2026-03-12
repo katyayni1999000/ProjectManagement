@@ -9,7 +9,7 @@
       <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
       <a routerLink="/journal" routerLinkActive="active">Journal</a>
       <button class="logout-btn" (click)="logout()">Logout</button>
-    } @else {
+    } @else if (showGuestNav) {
       <a routerLink="/auth/login" routerLinkActive="active">Login</a>
     }
   </nav>
